@@ -1,0 +1,74 @@
+Date =
+VAR FirstDay = MIN ( orders_clean[order_day] )
+VAR LastDay = MAX ( orders_clean[order_day] )
+RETURN
+    ADDCOLUMNS (
+        CALENDAR ( DATE ( YEAR ( FirstDay ), 1, 1 ), DATE ( YEAR ( LastDay ), 12, 31 ) ),
+        "Year", YEAR ( [Date] ),
+        "Month Number", MONTH ( [Date] ),
+        "Month", FORMAT ( [Date], "MMM yyyy" ),
+        "Weekday", FORMAT ( [Date], "ddd" )
+    )
+
+Total Revenue = SUM ( orders_clean[total_amount] )
+
+Total Orders = COUNTROWS ( orders_clean )
+
+Avg Order Value = DIVIDE ( [Total Revenue], [Total Orders] )
+
+Items Sold = SUM ( orders_clean[quantity] )
+
+Revenue Last Month = CALCULATE ( [Total Revenue], DATEADD ( 'Date'[Date], -1, MONTH ) )
+
+Revenue MoM % = DIVIDE ( [Total Revenue] - [Revenue Last Month], [Revenue Last Month] )
+
+Revenue Last Year = CALCULATE ( [Total Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+
+Revenue YoY % = DIVIDE ( [Total Revenue] - [Revenue Last Year], [Revenue Last Year] )
+
+Revenue MTD = TOTALMTD ( [Total Revenue], 'Date'[Date] )
+
+Revenue Running Total =
+CALCULATE (
+    [Total Revenue],
+    FILTER ( ALL ( 'Date' ), 'Date'[Date] <= MAX ( 'Date'[Date] ) )
+)
+
+Orders Last Month = CALCULATE ( [Total Orders], DATEADD ( 'Date'[Date], -1, MONTH ) )
+
+Orders MoM % = DIVIDE ( [Total Orders] - [Orders Last Month], [Orders Last Month] )
+
+Revenue MoM Label =
+VAR Change = [Revenue MoM %]
+RETURN
+    IF (
+        ISBLANK ( Change ),
+        "No previous month",
+        IF ( Change >= 0, "▲ ", "▼ " ) & FORMAT ( ABS ( Change ), "0.0%" ) & " vs last month"
+    )
+
+Top Product =
+FIRSTNONBLANK ( TOPN ( 1, VALUES ( orders_clean[product] ), [Total Revenue] ), 1 )
+
+Top City =
+FIRSTNONBLANK ( TOPN ( 1, VALUES ( orders_clean[city] ), [Total Revenue] ), 1 )
+
+Product Share % =
+DIVIDE ( [Total Revenue], CALCULATE ( [Total Revenue], ALL ( orders_clean[product] ) ) )
+
+Email Orders % =
+DIVIDE (
+    CALCULATE ( [Total Orders], orders_clean[source] = "email" ),
+    CALCULATE ( [Total Orders], ALL ( orders_clean[source] ) )
+)
+
+Last Successful Run =
+CALCULATE ( MAX ( pipeline_runs[finished_at] ), pipeline_runs[status] = "success" )
+
+Runs With Problems = CALCULATE ( COUNTROWS ( pipeline_runs ), pipeline_runs[status] <> "success" )
+
+Rows Loaded = SUM ( pipeline_runs[rows_loaded] )
+
+Rows Rejected = SUM ( pipeline_runs[rows_rejected] )
+
+Rejection Rate % = DIVIDE ( [Rows Rejected], SUM ( pipeline_runs[rows_read] ) )

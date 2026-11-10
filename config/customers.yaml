@@ -1,0 +1,5 @@
+customers:
+  acme:
+    name: Acme Farms
+    contract: orders
+    api_key_sha256: 2d2fac6ecf8a4cb5cb0250d73300e8fd8ee4f1f8cbf07c9bc41fc5897cda03aa

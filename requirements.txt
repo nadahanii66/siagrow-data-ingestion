@@ -1,0 +1,12 @@
+pandas
+openpyxl
+clickhouse-connect
+python-dotenv
+apscheduler
+tenacity
+httpx
+pytest
+pyyaml
+fastapi
+uvicorn
+python-multipart

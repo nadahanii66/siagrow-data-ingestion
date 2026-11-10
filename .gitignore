@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.env
+data/
+logs/
+sample_data/email_inbox/processed/
+sample_data/email_inbox/failed/
+sample_data/email_inbox/duplicates/

@@ -1,0 +1,3 @@
+source_id,customer_name,product,quantity,unit_price,city,order_date
+RETRY-1,Ahmed,Laptop,2,15000,Cairo,2026-11-10
+RETRY-2,Sara,Mouse,5,250,Giza,2026-11-10
